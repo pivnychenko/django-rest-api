@@ -1,7 +1,7 @@
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import viewsets
-from rest_framework.generics import ListCreateAPIView, GenericAPIView
+from rest_framework.generics import ListCreateAPIView, GenericAPIView, RetrieveDestroyAPIView
 from rest_framework import mixins
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
@@ -20,10 +20,7 @@ class EmployeeList(ListCreateAPIView):
     serializer_class = EmployeeSerializer
 
 
-class EmployeeDetailUpdateDestroy(mixins.RetrieveModelMixin,
-                    mixins.UpdateModelMixin,
-                    mixins.DestroyModelMixin,
-                    GenericAPIView):
+class EmployeeDetailUpdateDestroy(RetrieveDestroyAPIView, GenericAPIView):
     """
     View is used for get / update / delete Employee
     """
@@ -35,10 +32,7 @@ class EmployeeDetailUpdateDestroy(mixins.RetrieveModelMixin,
         return self.retrieve(request, *args, **kwargs)
 
 
-class StoreListDetailUpdateDestroy(mixins.RetrieveModelMixin,
-                    mixins.UpdateModelMixin,
-                    mixins.DestroyModelMixin,
-                    ListCreateAPIView):
+class StoreListDetailUpdateDestroy(RetrieveDestroyAPIView, ListCreateAPIView):
     """
     View is used for get / update / delete Store
     """
@@ -52,15 +46,11 @@ class StoreListDetailUpdateDestroy(mixins.RetrieveModelMixin,
         get Stores list or get Store by pk
         """
         employee = request.user
-        queryset = Store.objects.filter(employee__phone_number=employee.phone_number)
+        self.queryset = self.queryset.filter(employee__phone_number=employee.phone_number)
         if not pk:
-            # serializer = StoreSerializer(queryset, many=True)
-            # return Response(serializer.data)
-            self.queryset = Store.objects.filter(employee__phone_number=employee.phone_number)
-
             return self.list(request, *args, **kwargs)
 
-        store = get_object_or_404(queryset, pk=pk)
+        store = get_object_or_404(self.queryset, pk=pk)
 
         data = GeoLocation(request)
         visit = Visit()
