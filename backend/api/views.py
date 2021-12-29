@@ -51,7 +51,7 @@ class StoreListDetailUpdateDestroy(mixins.RetrieveModelMixin,
         get Stores list or get Store by pk
         """
         employee = request.user
-        queryset = Store.objects.filter(user__phone_number=employee.phone_number)
+        queryset = Store.objects.filter(employee__phone_number=employee.phone_number)
         if not pk:
             serializer = StoreSerializer(queryset, many=True)
             return Response(serializer.data)

@@ -10,7 +10,7 @@ class Store(models.Model):
         verbose_name="Title Store",
         max_length=300)
 
-    user = models.ForeignKey(
+    employee = models.ForeignKey(
         Employee,
         on_delete=models.CASCADE,
         verbose_name="Employee")
@@ -37,7 +37,8 @@ class Visit(models.Model):
     last_visit = models.DateTimeField(
         verbose_name="Last Visit Store",
         default=timezone.now,
-        null=True, blank=True)
+        null=True,
+        blank=True)
 
     # best practices use PointField for lat and long
     lat = models.CharField(

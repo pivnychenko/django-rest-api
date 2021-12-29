@@ -11,6 +11,9 @@ class Employee(AbstractBaseUser):
     """
     name = models.CharField(
         verbose_name="Name Worker",
+        null=True,
+        blank=True,  # needed for django admin
+        default=None,
         max_length=200)
 
     phone_number = models.CharField(
@@ -27,7 +30,7 @@ class Employee(AbstractBaseUser):
     objects = EmployeeManager()
 
     def __str__(self):
-        return self.name
+        return f'Employee - {self.name}'
 
     class Meta:
         verbose_name = "User - Employee"
