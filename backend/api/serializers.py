@@ -11,11 +11,11 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class StoreSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(queryset=Employee.objects.filter(admin=False), required=True)
+    employee = serializers.PrimaryKeyRelatedField(queryset=Employee.objects.filter(admin=False), required=True)
 
     class Meta:
         model = Store
-        fields = ['title', 'user', 'get_absolute_url']
+        fields = ['title', 'employee', 'get_absolute_url']
 
 
 class StoreDetailSerializer(serializers.ModelSerializer):
