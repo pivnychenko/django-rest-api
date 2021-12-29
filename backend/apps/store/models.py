@@ -13,8 +13,7 @@ class Store(models.Model):
     user = models.ForeignKey(
         Employee,
         on_delete=models.CASCADE,
-        verbose_name="Employee",
-        related_name="user_workers")
+        verbose_name="Employee")
 
     def get_absolute_url(self):
         return reverse('store_detail', kwargs={'pk': self.pk})

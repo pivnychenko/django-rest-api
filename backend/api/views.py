@@ -1,6 +1,7 @@
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import viewsets
-from rest_framework.generics import CreateAPIView, ListCreateAPIView, GenericAPIView
+from rest_framework.generics import ListCreateAPIView, GenericAPIView
 from rest_framework import mixins
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
@@ -9,13 +10,12 @@ from .serializers import EmployeeSerializer, StoreSerializer, StoreDetailSeriali
 from .utils import GeoLocation
 from apps.employee.models import Employee
 from apps.store.models import Store, Visit
-from api.authentication import ExampleAuthentication
 
 class EmployeeList(ListCreateAPIView):
     """
     View is used for create Employee
     """
-    permission_classes = (ExampleAuthentication,)
+    permission_classes = (IsAuthenticated,)
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
 
@@ -27,60 +27,35 @@ class EmployeeDetailUpdateDestroy(mixins.RetrieveModelMixin,
     """
     View is used for get / update / delete Employee
     """
-    permission_classes = (ExampleAuthentication,)
+    permission_classes = (IsAuthenticated,)
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
 
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
 
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
 
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
-
-
-class StoreViewSet(viewsets.ViewSet):
-    """
-    A simple ViewSet for listing store.
-    """
-    permission_classes = (ExampleAuthentication,)
-
-    def list(self, request):
-        employee = request.user
-        queryset = Store.objects.filter(user__phone_number=employee.phone_number)
-        serializer = StoreSerializer(queryset, many=True)
-        return Response(serializer.data)
-
-
-class StoreCreateView(CreateAPIView):
-    """
-    View is used for create Store
-    """
-    permission_classes = (ExampleAuthentication,)
-
-    queryset = Store.objects.all()
-    serializer_class = StoreSerializer
-
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
-
-
-class StoreDetailUpdateDestroy(mixins.RetrieveModelMixin,
+class StoreListDetailUpdateDestroy(mixins.RetrieveModelMixin,
                     mixins.UpdateModelMixin,
                     mixins.DestroyModelMixin,
-                    GenericAPIView):
+                    ListCreateAPIView):
     """
     View is used for get / update / delete Store
     """
-    permission_classes = (ExampleAuthentication,)
+    permission_classes = (IsAuthenticated,)
     queryset = Store.objects.all()
-    serializer_class = StoreDetailSerializer
+    serializer_class = StoreSerializer
 
-    def get(self, request, pk=None):
+    def get(self, request, pk=None, *args, **kwargs):
+        """
+        get Stores list or get Store by pk
+        """
         employee = request.user
         queryset = Store.objects.filter(user__phone_number=employee.phone_number)
+        if not pk:
+            serializer = StoreSerializer(queryset, many=True)
+            return Response(serializer.data)
+
         store = get_object_or_404(queryset, pk=pk)
 
         data = GeoLocation(request)
@@ -89,13 +64,6 @@ class StoreDetailUpdateDestroy(mixins.RetrieveModelMixin,
 
         serializer = StoreDetailSerializer(store)
         return Response(serializer.data)
-
-
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
-
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
 
 
 def home(request):
