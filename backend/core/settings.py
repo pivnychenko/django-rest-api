@@ -31,12 +31,6 @@ ALLOWED_HOSTS = ["*"]
 GEOIP_LOCATION =  'https://geolocation-db.com/json/'
 # Application definition
 
-MANAGERS = (
-    ('Justin Mitchel', "pivnychenko@gmail.com"),
-)
-
-ADMINS = MANAGERS
-
 
 INSTALLED_APPS = [
     'django.contrib.admin',
