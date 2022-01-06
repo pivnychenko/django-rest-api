@@ -1,3 +1,4 @@
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import viewsets
@@ -11,10 +12,17 @@ from .utils import GeoLocation
 from apps.employee.models import Employee
 from apps.store.models import Store, Visit
 
+
+class LargeResultsSetPagination(PageNumberPagination):
+    page_size = 1
+    page_size_query_param = 'page_size'
+
+
 class EmployeeList(ListCreateAPIView):
     """
     View is used for create Employee
     """
+    pagination_class = LargeResultsSetPagination
     permission_classes = (IsAuthenticated,)
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
@@ -33,6 +41,7 @@ class StoreList(ListCreateAPIView):
     permission_classes = (IsAuthenticated,)
     queryset = Store.objects.all()
     serializer_class = StoreSerializer
+    pagination_class = LargeResultsSetPagination
 
     def get(self, request, *args, **kwargs):
         """
